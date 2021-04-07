@@ -13,6 +13,28 @@ const Profile = {
         "vacation-per-year": 4,
         "value-hour": 75
     },
+    controllers: {
+        index(req, res) {
+            return res.render(basePath + "profile", { profile: Profile.data });
+        },
+        update(req, res) {
+            const data = req.body;
+            const weeksPerYear = 52;
+            const weeksPerMonth = (weeksPerYear - data["vacation-per-year"]) / 12;
+            const weekTotalHours = data["hours-per-day"] * data["days-per-week"];
+            const monthlyTotalHours = weekTotalHours * weeksPerMonth;
+
+            const valueHour = data["monthly-budget"] / monthlyTotalHours;
+
+            Profile.data = {
+                ...Profile.data,
+                ...req.body,
+                "value-hour": valueHour
+            };
+
+            return res.redirect("/profile");
+        },
+    },
 };
 
 const Job = {
@@ -42,7 +64,7 @@ const Job = {
                     ...job,
                     remaining,
                     status,
-                    budget: Profile["value-hour"] * job["total-hours"]
+                    budget: Job.services.calculateBudget(Profile.data["value-hour"], job["total-hours"])
                 };
             });
 
@@ -52,7 +74,7 @@ const Job = {
                 jobs: updatedJobs
             });
         },
-        create(req, res) { res.render(basePath + "job") },
+        create(req, res) { return res.render(basePath + "job") },
         save(req, res) {
             const lastId = Job.data[Job.data.length - 1]?.id || 0;
 
@@ -64,7 +86,19 @@ const Job = {
                 created_at: Date.now()
             });
 
-            res.redirect("/");
+            return res.redirect("/");
+        },
+        show(req, res) {
+            const jobId = req.params.id;
+            const job = Job.data.find(job => Number(job.id) === Number(jobId));
+
+            if (!job) {
+                return res.send("Job not found!");
+            }
+
+            job.budget = Job.services.calculateBudget(Profile.data["value-hour"], job["total-hours"]);
+
+            return res.render(basePath + "job-edit", { job });
         },
     },
     services: {
@@ -79,14 +113,17 @@ const Job = {
 
             return dayDiff;
         },
+        calculateBudget: (valueHour, totalHours) => valueHour * totalHours,
     },
 };
 
 routes.get("/", Job.controllers.index);
 
-routes.get("/profile", (req, res) => res.render(basePath + "profile", { profile: Profile.data }));
+routes.get("/profile", Profile.controllers.index);
 
-routes.get("/job/edit", (req, res) => res.render(basePath + "job-edit"));
+routes.post("/profile", Profile.controllers.update);
+
+routes.get("/job/:id/edit", Job.controllers.show);
 
 routes.get("/job", Job.controllers.create);
 
