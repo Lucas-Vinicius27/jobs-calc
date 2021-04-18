@@ -29,14 +29,16 @@ const initDb = {
             monthly_budget,
             hours_per_day,
             days_per_week,
-            vacation_per_year
+            vacation_per_year,
+            value_hour
             ) VALUES (
             "Lucas Santos",
             "https://github.com/lucas-vinicius27.png",
             3000,
             6,
             5,
-            4
+            4,
+            75
         );`);
 
         await db.run(`INSERT INTO jobs (
