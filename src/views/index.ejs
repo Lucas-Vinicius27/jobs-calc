@@ -34,11 +34,15 @@
         <img id="logo" src="/images/logo.svg" alt="Logo" />
         <span id="notification">
           <img src="/images/alert-octagon.svg" alt="Alerta" />
-          Você tem 2 horas livres no seu dia
+          <% if(freeHours <= 0) { %>
+            Você não tem horas livres no seu dia
+          <% } else { %>
+            Você tem <%= freeHours %> horas livres no seu dia
+          <% } %>
         </span>
         <a href="/profile" id="avatar-profile">
           <p>
-            <%= name %> <span>Ver perfil</span>
+            <%= name %><span>Ver perfil</span>
           </p>
           <img src="<%= avatar %>" alt="imagem de perfil" />
         </a>
@@ -51,15 +55,15 @@
 
         <div class="info">
           <div class="total">
-            <strong>12</strong>
+            <strong><%= statusCount.total %></strong>
             Projetos ao total
           </div>
           <div class="in-progress">
-            <strong>7</strong>
+            <strong><%= statusCount.progress %></strong>
             Em andamento
           </div>
           <div class="finished">
-            <strong>4</strong>
+            <strong><%= statusCount.done %></strong>
             Encerrados
           </div>
         </div>
@@ -80,7 +84,7 @@
       <div class="cards">
         <% jobs.forEach((job)=> { %>
           <div class="card <%= job.status %>" data-id="<%= job.id %>">
-            <div class="id column">1</div>
+            <div class="id column"><%= job.id %></div>
             <div class="name column">
               <%= job.name %>
             </div>
@@ -89,9 +93,9 @@
               <p>
                 <% if (job.status==="progress" ) { %>
                   <%= job.remaining %> dias para a entrega
-                    <% } else { %>
-                      Prazo encerrado
-                      <% } %>
+                <% } else { %>
+                  Prazo encerrado
+                <% } %>
               </p>
             </div>
             <div class="amount column">
@@ -113,7 +117,7 @@
             </div>
           </div>
           <!-- end card -->
-          <% }) %>
+        <% }) %>
       </div>
       <!-- end cards -->
     </main>
@@ -132,7 +136,7 @@
         <button class="button red" type="submit" form="delete-job">Excluir Job</button>
       </footer>
     </div>
-    <form method="post" action="/job/delete/<%= job.id %>" id="delete-job"></form>
+    <form method="post" action="/job/delete/<%= jobs.id %>" id="delete-job"></form>
   </div>
   <!-- end modal-wrapper -->
 </body>
