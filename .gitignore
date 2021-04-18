@@ -119,5 +119,5 @@ dist
 .pnp.*
 
 # Data Base sqlite
-#src/database/database.sqlite
+src/database/database.sqlite
 #src/database/database.test.sqlite
