@@ -22,6 +22,9 @@ module.exports = {
     set(newData) {
         data = newData;
     },
+    create(newJob) {
+        data.push(newJob);
+    },
     delete(id) {
         data = data.filter(job => Number(job.id) !== Number(id));
     }
